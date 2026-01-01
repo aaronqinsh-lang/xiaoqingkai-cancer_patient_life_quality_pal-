@@ -12,8 +12,7 @@ const supabaseUrl = (process.env as any).NEXT_PUBLIC_SUPABASE_URL || 'https://rq
 
 // The key can be provided under different environment variable names depending on the platform.
 const supabaseAnonKey = 
-  (process.env as any).NEXT_PUBLIC_SUPABASE_ANON_KEY || 
-  (process.env as any).NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 
-  'sb_publishable_1WlEdSsW6glJNyxgERtzJA_HmuaGVjT';
+  (process.env as any).NEXT_PUBLIC_SUPABASE_ANON_KEY
+  (process.env as any).NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
