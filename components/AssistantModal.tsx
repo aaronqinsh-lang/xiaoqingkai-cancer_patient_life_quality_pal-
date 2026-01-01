@@ -1,13 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-// Fix: Added Bot to the imports from lucide-react
-import { X, Mic, Send, Waves, Loader2, StopCircle, Share2, Download, Trash2, Copy, MessageSquare, ChevronDown, ChevronUp, History, ThumbsUp, ThumbsDown, Bot } from 'lucide-react';
+import { X, Mic, Send, Waves, Loader2, StopCircle, History, MessageSquare, Bot } from 'lucide-react';
 import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { UserProfile, ChatMessage } from '../types';
 import { getAssistantResponse } from '../services/geminiService';
-import { COLORS } from '../constants';
 
-// Fix: Implementation of decode function as per guidelines
+// Implementation of decode function as per guidelines
 function decode(base64: string) {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -16,9 +13,10 @@ function decode(base64: string) {
   return bytes;
 }
 
-// Fix: Implementation of decodeAudioData function for raw PCM data as per guidelines
+// Implementation of decodeAudioData function for raw PCM data as per guidelines
 async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: number, numChannels: number): Promise<AudioBuffer> {
-  const dataInt16 = new Int16Array(data.buffer);
+  // Use byteOffset and byteLength to handle potential alignment issues in underlying buffer
+  const dataInt16 = new Int16Array(data.buffer, data.byteOffset, data.byteLength / 2);
   const frameCount = dataInt16.length / numChannels;
   const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
   for (let channel = 0; channel < numChannels; channel++) {
@@ -30,7 +28,7 @@ async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: 
   return buffer;
 }
 
-// Fix: Implementation of encode function as per guidelines
+// Implementation of encode function as per guidelines
 function encode(bytes: Uint8Array) {
   let binary = '';
   const len = bytes.byteLength;
@@ -55,7 +53,9 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
   const scrollRef = useRef<HTMLDivElement>(null);
   const liveSessionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const inputAudioContextRef = useRef<AudioContext | null>(null);
   const nextStartTimeRef = useRef(0);
+  const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
 
   useEffect(() => {
     const saved = localStorage.getItem('assistant_history');
@@ -90,21 +90,45 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
   };
 
   const stopVoice = () => {
-    liveSessionRef.current?.close();
-    audioContextRef.current?.close();
+    if (liveSessionRef.current) {
+      liveSessionRef.current.close();
+      liveSessionRef.current = null;
+    }
+    
+    for (const source of sourcesRef.current) {
+      try { source.stop(); } catch(e) {}
+    }
+    sourcesRef.current.clear();
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+    if (inputAudioContextRef.current) {
+      inputAudioContextRef.current.close().catch(() => {});
+      inputAudioContextRef.current = null;
+    }
+    
     setIsVoiceActive(false);
+    nextStartTimeRef.current = 0;
   };
 
   const startLiveVoice = async () => {
     setIsVoiceActive(true);
-    // Fix: Create a new GoogleGenAI instance right before connecting
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-    const outputContext = audioContextRef.current;
-    const inputContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
     
     try {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      inputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      
+      const outputContext = audioContextRef.current;
+      const inputContext = inputAudioContextRef.current;
+
+      await outputContext.resume();
+      await inputContext.resume();
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
         callbacks: {
@@ -114,9 +138,13 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
             scriptProcessor.onaudioprocess = (e) => {
               const inputData = e.inputBuffer.getChannelData(0);
               const int16 = new Int16Array(inputData.length);
-              for (let i = 0; i < inputData.length; i++) int16[i] = inputData[i] * 32768;
-              const pcmBlob = { data: encode(new Uint8Array(int16.buffer)), mimeType: 'audio/pcm;rate=16000' };
-              // Fix: Solely rely on sessionPromise resolves to send real-time input
+              for (let i = 0; i < inputData.length; i++) {
+                int16[i] = Math.max(-1, Math.min(1, inputData[i])) * 32767;
+              }
+              const pcmBlob = { 
+                data: encode(new Uint8Array(int16.buffer)), 
+                mimeType: 'audio/pcm;rate=16000' 
+              };
               sessionPromise.then(s => s.sendRealtimeInput({ media: pcmBlob }));
             };
             source.connect(scriptProcessor);
@@ -125,18 +153,32 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
           onmessage: async (msg: LiveServerMessage) => {
             const audioBase64 = msg.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
             if (audioBase64) {
-              // Fix: Use nextStartTime to ensure gapless playback
               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outputContext.currentTime);
               const buffer = await decodeAudioData(decode(audioBase64), outputContext, 24000, 1);
               const source = outputContext.createBufferSource();
               source.buffer = buffer;
               source.connect(outputContext.destination);
+              source.addEventListener('ended', () => sourcesRef.current.delete(source));
               source.start(nextStartTimeRef.current);
               nextStartTimeRef.current += buffer.duration;
+              sourcesRef.current.add(source);
+            }
+
+            if (msg.serverContent?.interrupted) {
+              for (const source of sourcesRef.current) {
+                try { source.stop(); } catch(e) {}
+              }
+              sourcesRef.current.clear();
+              nextStartTimeRef.current = 0;
             }
           },
-          onclose: () => setIsVoiceActive(false),
-          onerror: (e) => console.error('Live error:', e)
+          onclose: (e) => {
+            setIsVoiceActive(false);
+          },
+          onerror: (e) => {
+            console.error('Live API Error:', e);
+            setIsVoiceActive(false);
+          }
         },
         config: {
           responseModalities: [Modality.AUDIO],
@@ -144,10 +186,12 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
           systemInstruction: "你是'小青卡'健康管家。用中文提供温暖、专业且结构化的建议。"
         }
       });
+
       liveSessionRef.current = await sessionPromise;
     } catch (err) {
-      console.error(err);
+      console.error('Failed to start voice session:', err);
       setIsVoiceActive(false);
+      stopVoice();
     }
   };
 
@@ -156,7 +200,7 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
   return (
     <div className="fixed inset-0 z-[200] flex items-end md:items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="w-full max-w-md mx-auto bg-white rounded-t-[2.5rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col h-[92vh] animate-in slide-in-from-bottom duration-300 relative border-x border-slate-100">
-        <header className="px-6 py-5 flex items-center justify-between border-b bg-white relative z-20">
+        <header className="px-6 py-5 flex items-center justify-between border-b bg-white relative z-20 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-celadon shadow-sm relative overflow-hidden">
                <div className="absolute inset-0 bg-crackle opacity-20"></div>
@@ -165,14 +209,14 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
             <div>
               <h3 className="font-black text-slate-800 text-base tracking-tight leading-tight">小青助手</h3>
               <div className="flex bg-slate-50 p-0.5 rounded-full mt-1 border border-slate-100">
-                <button onClick={() => setMode('text')} className={`text-[9px] px-2.5 py-1 rounded-full font-bold transition-all ${mode === 'text' ? 'bg-celadon-900 text-white shadow-sm' : 'text-slate-400'}`}>文本咨询</button>
+                <button onClick={() => { if(isVoiceActive) stopVoice(); setMode('text'); }} className={`text-[9px] px-2.5 py-1 rounded-full font-bold transition-all ${mode === 'text' ? 'bg-celadon-900 text-white shadow-sm' : 'text-slate-400'}`}>文本咨询</button>
                 <button onClick={() => setMode('voice')} className={`text-[9px] px-2.5 py-1 rounded-full font-bold transition-all ${mode === 'voice' ? 'bg-celadon-900 text-white shadow-sm' : 'text-slate-400'}`}>实时语音</button>
               </div>
             </div>
           </div>
           <div className="flex gap-1">
             <button onClick={() => setShowHistory(!showHistory)} className={`p-2 rounded-full transition-all ${showHistory ? 'bg-celadon-50 text-celadon-900' : 'text-slate-400 hover:bg-slate-50'}`}><History className="w-5 h-5" /></button>
-            <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full text-slate-400 transition-colors"><X className="w-6 h-6" /></button>
+            <button onClick={() => { if(isVoiceActive) stopVoice(); onClose(); }} className="p-2 hover:bg-slate-50 rounded-full text-slate-400 transition-colors"><X className="w-6 h-6" /></button>
           </div>
         </header>
 
@@ -180,6 +224,7 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
           <div className="p-4 space-y-3">
             <div className="flex justify-between items-center mb-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">最近咨询记录</span>
+              <button onClick={() => { setMessages([]); localStorage.removeItem('assistant_history'); }} className="text-[9px] font-bold text-rose-400 uppercase hover:text-rose-600 transition-colors">清除记录</button>
             </div>
             <div className="space-y-2 overflow-y-auto max-h-48 no-scrollbar">
               {messages.length === 0 ? <p className="text-xs text-slate-300 text-center py-4 italic">暂无咨询记录</p> : messages.filter(m => m.role === 'user').slice(-5).map((m, i) => (
@@ -194,12 +239,12 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
 
         <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-slate-50/30 no-scrollbar">
           {mode === 'text' ? (
-            <div ref={scrollRef} className="space-y-6">
+            <div ref={scrollRef} className="space-y-6 pb-4">
               {messages.length === 0 && (
                 <div className="text-center py-20 animate-in fade-in zoom-in duration-500">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-50 text-2xl">🍃</div>
                   <h4 className="font-bold text-slate-800">你好呀，青友</h4>
-                  <p className="text-xs text-slate-400 mt-2 max-w-[180px] mx-auto leading-relaxed">很高兴在这个时刻陪伴你。关于治疗或心情，有什么想聊聊 of 吗？</p>
+                  <p className="text-xs text-slate-400 mt-2 max-w-[180px] mx-auto leading-relaxed">很高兴在这个时刻陪伴你。关于治疗或心情，有什么想聊聊的吗？</p>
                 </div>
               )}
               {messages.map(msg => (
@@ -248,8 +293,29 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
         {mode === 'text' && (
           <div className="p-5 bg-white border-t relative z-20">
             <div className="flex gap-2 relative">
-              <input className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all pr-12" placeholder="输入你想说的话..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSendText()} />
-              <button onClick={handleSendText} disabled={!input.trim() || isLoading} className="absolute right-2 top-2 p-2 bg-celadon-900 text-white rounded-xl disabled:bg-slate-200 transition-all active:scale-90"><Send className="w-4 h-4" /></button>
+              <input 
+                className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all pr-24" 
+                placeholder="输入你想说的话..." 
+                value={input} 
+                onChange={e => setInput(e.target.value)} 
+                onKeyDown={e => e.key === 'Enter' && handleSendText()} 
+              />
+              <div className="absolute right-2 top-2 flex items-center gap-1.5">
+                <button 
+                  onClick={() => setMode('voice')} 
+                  className="p-2 text-slate-300 hover:text-celadon-900 hover:bg-celadon-50 rounded-xl transition-all active:scale-90"
+                  title="切换到语音模式"
+                >
+                  <Mic className="w-4.5 h-4.5" />
+                </button>
+                <button 
+                  onClick={handleSendText} 
+                  disabled={!input.trim() || isLoading} 
+                  className="p-2 bg-celadon-900 text-white rounded-xl disabled:bg-slate-200 transition-all active:scale-90 shadow-sm"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <p className="text-[10px] text-center text-slate-300 mt-4 uppercase tracking-[0.2em] font-black">AI Support Powered by Gemini</p>
           </div>

@@ -1,20 +1,39 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 小青卡 - 肿瘤患者生活与关系管理助手
 
-# Run and deploy your AI Studio app
+## 🌟 产品简介
+「小青卡」是一款专为肿瘤患者及其家属设计的生命质量管理工具。我们通过汝窑天青色的“温润”美学设计，结合 Google Gemini API 的尖端 AI 技术，为青友（患者）提供感性陪伴与理性的医学生活指导。项目旨在帮助患者在治疗期间重建社交自信、管理亲密关系并平稳回归社会生活。
 
-This contains everything you need to run your app locally.
+## ✨ 核心功能
+- **🍃 AI 小青助手**：集成 Gemini 实时语音与文本对话，提供 24/7 的专业健康咨询与心理慰藉，支持实时语音“树洞”模式。
+- **📅 时光看板 (Days Matter)**：记录抗癌路上的每一个值得。支持：
+  - 正数天数（如：术后康复天数）
+  - 倒数天数（如：化疗结束倒计时）
+  - 周期管理（如：21天化疗周期追踪）
+- **📚 吾知百科**：基于 RAG 理念的结构化抗癌百科，采用 Clean Content 渲染技术，将医学指南转化为极简美感的阅读体验。
+- **🤝 吾享社区**：小红书式灵感瀑布流，鼓励分享美食、美文、美景与抗癌实操经验。
+- **👤 健康档案 (吾身)**：本地化存储的身高、体重、营养状态等核心数据，辅助 AI 提供更精准的个性化建议。
 
-View your app in AI Studio: https://ai.studio/apps/drive/1Wd4mlCIlWrmZQ6vum2TyMOzvi3L6O8W0
+## 🛠️ 技术栈
+- **前端框架**：React 19 (ES6 Modules)
+- **设计系统**：Tailwind CSS (汝窑定制调色盘)
+- **图标系统**：Lucide React
+- **人工智能**：Google Gemini API (@google/genai) - 使用 `gemini-3-flash-preview` 驱动对话。
+- **实时通信**：Gemini Live API - 实现低延迟语音交互。
+- **后端云服务**：Supabase (负责 Auth 鉴权及社区内容同步)
 
-## Run Locally
+## 🎨 视觉设计规范
+- **色调**：以 #94D6DA (天青色) 为核心，搭配 #2F5D62 (深林绿)。
+- **质感**：模拟汝窑“蝉翼纹”碎裂质感，通过极细线条背景呈现东方美学。
+- **原则**：极简、去医疗化、温暖、结构化。
 
-**Prerequisites:**  Node.js
+## 🚀 部署注意事项
 
+如果您计划将本项目部署到静态托管平台，请务必在 `index.html` 中正确引用入口脚本：
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```html
+<body>
+  <div id="root"></div>
+  <script type="module" src="index.tsx"></script>
+</body>
+</html>
+```
