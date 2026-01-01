@@ -8,7 +8,7 @@ import { createClient } from '@supabase/supabase-js';
  * credentials as defaults to ensure the app works out-of-the-box in the 
  * preview environment.
  */
-const supabaseUrl = (process.env as any).NEXT_PUBLIC_SUPABASE_URL || 'https://rqdeihkitoswedegwqgd.supabase.co';
+const supabaseUrl = (process.env as any).NEXT_PUBLIC_SUPABASE_URL;
 
 // The key can be provided under different environment variable names depending on the platform.
 const supabaseAnonKey = 
