@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小青卡 - 生活与关系管理助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              celadon: {
+                DEFAULT: '#94D6DA',
+                50: '#F0F9F9',
+                100: '#E1F3F4',
+                200: '#B8E3E6',
+                500: '#94D6DA',
+                600: '#7CBFC3',
+                900: '#2F5D62',
+              },
+              deepForest: '#2F5D62',
+              moonWhite: '#F8FAFA',
+            },
+            boxShadow: {
+              'glaze': '0 10px 30px -5px rgba(148, 214, 218, 0.2)',
+              'glaze-hover': '0 20px 40px -10px rgba(148, 214, 218, 0.35)',
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 3s ease-in-out infinite',
+              'breath': 'breath 4s ease-in-out infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              breath: {
+                '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(148, 214, 218, 0.4)' },
+                '50%': { transform: 'scale(1.05)', boxShadow: '0 0 25px 10px rgba(148, 214, 218, 0.2)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #F8FAFA;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .crackle-border {
+        border: 1px solid rgba(148, 214, 218, 0.15);
+      }
+      
+      /* 核心：蝉翼纹理背景 - 极其细微的随机开片感 */
+      .bg-crackle {
+        background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20L40 0M60 80L100 40M140 20L180 60M20 160L80 120M120 180L180 140M100 100L120 80M50 50L0 80M180 0L150 30' stroke='%23E1F3F4' stroke-width='0.4' fill='none' opacity='0.5'/%3E%3C/svg%3E");
+      }
+      
+      .card-glaze {
+        position: relative;
+        background-color: white;
+      }
+      /* 卡片内纹理增强 */
+      .card-glaze::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0M80 120L120 80M0 120L120 0M40 80L80 40' stroke='%23E1F3F4' stroke-width='0.3' fill='none' opacity='0.3'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1;
+      }
+      .card-glaze > * {
+        position: relative;
+        z-index: 2;
+      }
+
+      /* 针对深色背景的浅色纹理 */
+      .bg-crackle-light {
+        background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20L40 0M60 80L100 40M140 20L180 60M20 160L80 120M120 180L180 140M100 100L120 80M50 50L0 80M180 0L150 30' stroke='%23F0F9F9' stroke-width='0.5' fill='none' opacity='0.2'/%3E%3C/svg%3E");
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.48.1"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>

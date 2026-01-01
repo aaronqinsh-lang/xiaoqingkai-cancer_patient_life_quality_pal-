@@ -1,0 +1,8 @@
+{
+  "name": "小青卡 - 肿瘤患者生活与关系管理助手",
+  "description": "提供权威、感性且实用的肿瘤患者生活质量指导，涵盖亲密关系、身体形象、工作与康复等全方位支持。",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}
