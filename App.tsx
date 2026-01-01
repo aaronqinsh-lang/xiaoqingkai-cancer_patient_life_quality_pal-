@@ -27,40 +27,14 @@ const DEFAULT_PROFILE: UserProfile = {
 
 const INITIAL_ARTICLES = [
   { 
-    id: 'a1', 
-    category_id: 'body-image', 
-    tag: '权威医学建议', 
-    title: '皮肤与甲床：化疗期间的温润守护', 
-    icon: 'user', 
-    image_url: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=800', 
-    content: `## 【核心结论】\n化疗药物在杀伤肿瘤细胞的同时，可能累及皮肤代谢。通过“极简保湿”与“物理防晒”，我们可以有效预防手足综合征与皮肤干裂。\n\n## 【深度解析】\n### 1. 极简护肤法则\n选用无酒精、无香精、弱酸性的氨基酸洗面奶。洗脸水温控制在32-34℃，避免破坏天然皮脂膜。洗澡后3分钟内，全身涂抹含有神经酰胺或角鲨烷的身体乳。\n\n### 2. 甲床危机应对\n部分药物会导致指甲变脆、变黑。建议剪短指甲，避免美甲或剥除倒刺。若甲床出现红肿渗液，需及时涂抹莫匹罗星软膏并咨询医生。\n\n### 3. 物理避光重要性\n化疗会导致皮肤对紫外线极其敏感（光毒性）。外出请务必佩戴遮阳帽、撑防紫外线伞，而非单纯依赖化学防晒霜。\n\n## 【温情寄语】\n细腻的呵护是对身体最温柔的告白，即便在风暴中，你依然值得如瓷器般被珍惜。`
+    id: 'a1', category_id: 'body-image', tag: '权威医学建议', title: '肤色之变：化疗色素沉着的预防与修复', 
+    icon: 'user', image_url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=800', 
+    content: `## 【核心结论】\n部分化疗药会导致肤色变暗 or 指关节发黑，这是药物累积的正常生理反应。通过“高频补水”与“温和美白”，可加速代谢更新。\n\n## 【深度解析】\n### 1. 为什么会变黑？\n如氟尿嘧啶等药物会刺激黑色素细胞活性。停药后3-6个月通常会自然淡化。\n\n### 2. 修护实操\n使用含烟酰胺或VC衍生物的温和身体乳。避免使用强效去角质产品，此时皮肤屏障极其脆弱。\n\n## 【温情寄语】\n暗沉只是暂时的“阴天”，那是身体在替你抵挡风暴，阳光终会再次穿透云层。`
   },
   { 
-    id: 'a2', 
-    category_id: 'work-life', 
-    tag: '法律与政策', 
-    title: '权益盾牌：重疾理赔与商保权益全攻略', 
-    icon: 'shield', 
-    image_url: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=800', 
-    content: `## 【核心结论】\n确诊后的理赔申请应“快、准、全”。合理利用商业保险与大病医疗救助，是化疗期间经济支柱的关键。\n\n## 【深度解析】\n### 1. 理赔黄金窗口期\n确诊后请在10日内通过电话或APP正式报案。病理报告是理赔的“金钥匙”，请务必妥善保存原件。 \n\n### 2. 五大必备资料清单\n- 身份证明与保单原件\n- 门诊手册与住院总费用清单\n- 病理切片报告单\n- 出院小结（需盖章）\n- 银行收款账户\n\n### 3. 税优识别与个税抵扣\n根据国家规定，纳税人发生的符合条件的大病医疗支出，在年度汇算清缴时，可享受专项附加扣除。\n\n## 【温情寄语】\n法律与契约是文明社会为您预留的铠甲，学会穿上它，让财务的从容化为康复的底气。`
-  },
-  {
-    id: 'a3',
-    category_id: 'exercise',
-    tag: '康复运动处方',
-    title: '能量存折：缓解癌性疲乏的‘平衡木’法则',
-    icon: 'activity',
-    image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800',
-    content: `## 【核心结论】\n疲乏（Fatigue）不是因为懒惰，而是身体在重建免疫系统。通过“节奏管理”与“轻量伸展”，我们可以逐步找回精力平衡点。\n\n## 【深度解析】\n### 1. 建立能量日志\n记录每天的精力曲线。在精力最佳的“黄金时段”处理最重要的事情，其余时间强制休息。这被称为“Pacing策略”。\n\n### 2. 三段式深呼吸练习\n每天进行3组，每组5分钟。深长的腹式呼吸能提高血氧饱和度，直接改善因贫血或焦虑引起的胸闷与乏力。\n\n### 3. 椅子上的瑜伽\n即便在病床上，也可以进行脚踝泵运动（脚尖勾起-放下）。这能促进下肢血液循环，预防因久卧导致的深静脉血栓。\n\n## 【温情寄语】\n接纳暂时的无力感。生活不必总是全速前进，在阴凉处小憩，也是为了下一次更好的出发。`
-  },
-  {
-    id: 'a4',
-    category_id: 'intimacy',
-    tag: '心理支持指南',
-    title: '脆弱的力量：重疾家庭的深度沟通策略',
-    icon: 'heart',
-    image_url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=800',
-    content: `## 【核心结论】\n生病不代表失去了家庭地位。坦诚表达恐惧与需求，比“故作坚强”更能拉近与伴侣的距离。\n\n## 【深度解析】\n### 1. 破冰“我感到”沟通法\n尝试这样开口：“我感到很累，今天希望能由你来辅导孩子作业。”明确、具体、非指责的表达，能减少伴侣的盲目猜测和压力。\n\n### 2. 共享“无癌时区”\n每天设置30分钟的“非医疗话题时间”。聊聊过去的回忆、未来的旅行或最近看的书。不要让疾病成为家庭谈话的全部。\n\n### 3. 伴侣的心理重建\n照顾者同样需要支持。鼓励伴侣去锻炼、社交，只有他/她的心理账户充盈，才能为您提供更高质量的陪伴。\n\n## 【温情寄语】\n爱是流动的光。在阴影中牵手，这种共同面对未知的亲密，将成为余生最坚固的纽带。`
+    id: 'a2', category_id: 'body-image', tag: '生活美学', title: '百变之美：医学级假发挑选与舒适佩戴全攻略', 
+    icon: 'star', image_url: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=800', 
+    content: `## 【核心结论】\n假发不仅是掩饰，更是重塑自信的配饰。选择“真发手工钩织”与“内网抗菌”是舒适度的关键。\n\n## 【深度解析】\n### 1. 材质对比\n- 化纤丝：定型好，价格优，但易产生静电，透气性稍差。\n- 真发丝：质感自然，可二次修剪，由于是蛋白质材质，透气性最佳。\n\n### 2. 佩戴细节\n夏季可配合冰丝发网，防止头皮过热产生湿疹。每天佩戴不宜超过8小时。\n\n## 【温情寄语】\n换个发型，换种心情。即便在康复期，你依然拥有定义自己美丽的权利。`
   }
 ];
 
@@ -83,7 +57,11 @@ const App: React.FC = () => {
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
   const [legalView, setLegalView] = useState<'PRIVACY' | 'RISK' | null>(null);
 
-  // Fetch initial data
+  // Fix: Defined filteredPosts to filter social posts based on the selected category tag
+  const filteredPosts = posts.filter(post => 
+    shareCategory === 'all' || (post.tags && post.tags.includes(shareCategory))
+  );
+
   const fetchData = async () => {
     try {
       const { data: postsData } = await supabase.from('social_posts').select('*').order('created_at', { ascending: false });
@@ -123,30 +101,8 @@ const App: React.FC = () => {
       }
     });
 
-    // Real-time Subscription Setup
-    const knowledgeChannel = supabase
-      .channel('knowledge-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'knowledge_articles' },
-        (payload) => {
-          console.log('Knowledge updated real-time:', payload);
-          fetchData(); 
-        }
-      )
-      .subscribe();
-
-    const postsChannel = supabase
-      .channel('posts-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'social_posts' },
-        (payload) => {
-          console.log('Posts updated real-time:', payload);
-          fetchData();
-        }
-      )
-      .subscribe();
+    const knowledgeChannel = supabase.channel('knowledge-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'knowledge_articles' }, () => fetchData()).subscribe();
+    const postsChannel = supabase.channel('posts-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'social_posts' }, () => fetchData()).subscribe();
 
     return () => {
       subscription.unsubscribe();
@@ -181,37 +137,62 @@ const App: React.FC = () => {
     return { val: Math.abs(diff), label: '天已过' };
   };
 
-  const filteredPosts = posts.filter(post => 
-    shareCategory === 'all' || (post.tags && post.tags.includes(shareCategory))
-  );
-
   const renderStructuredContent = (content: string) => {
     if (!content) return null;
-    const processedText = content.replace(/\\n/g, '\n');
-    const segments = processedText.split(/(?=#{1,3}\s*【|【)/g);
+    
+    // 1. 深度清洗：移除所有加粗符号、多余空行、以及行内残留的 Markdown 标记
+    const cleanContent = content
+      .replace(/\\n/g, '\n')
+      .replace(/\*\*(.*?)\*\*/g, '$1') // 移除加粗 **
+      .replace(/__(.*?)__/g, '$1')      // 移除加粗 __
+      .trim();
+    
+    // 2. 按标题切割 (## 或 ###)
+    const segments = cleanContent.split(/(?=^#{2,3}\s*)/m);
 
     return segments.map((segment, index) => {
       const trimmed = segment.trim();
       if (!trimmed) return null;
-      const headerMatch = trimmed.match(/^(?:#{1,3}\s*)?【(.*?)】/);
+
+      // 3. 匹配标题行 (去除起始的 ## 或 ###, 以及可选的 【】)
+      const headerMatch = trimmed.match(/^#{2,3}\s*(?:【)?(.*?)(?:】)?(?:\s|\n|$)/);
+      
       if (headerMatch) {
-        const title = headerMatch[1];
-        const bodyText = trimmed.replace(/^(?:#{1,3}\s*)?【.*?】/, '').trim();
+        const title = headerMatch[1].trim();
+        const bodyText = trimmed.replace(/^#{2,3}\s*.*(?:\s|\n|$)/, '').trim();
+        
         return (
           <div key={index} className="mb-8 last:mb-0">
-            <div className="inline-block px-4 py-1.5 rounded-xl bg-celadon-50 text-celadon-900 font-black text-sm mb-4 border border-celadon-100/50">{title}</div>
+            <div className="inline-block px-4 py-1.5 rounded-xl bg-celadon-50 text-celadon-900 font-black text-sm mb-4 border border-celadon-100/50">
+              {title}
+            </div>
             <div className="text-slate-600 leading-loose space-y-4">
               {bodyText.split('\n').filter(p => p.trim()).map((paragraph, pIdx) => {
-                const cleanPara = paragraph.trim().replace(/^[-*]\s+|\d+\.\s+/, '');
+                // 4. 清理段落内的 Markdown 列表符和子标题符
+                const cleanPara = paragraph.trim()
+                  .replace(/^[-*+]\s+/, '') // 无序列表
+                  .replace(/^\d+\.\s+/, '') // 有序列表
+                  .replace(/^#{1,6}\s+/, ''); // 误写的标题符
+                
                 return <p key={pIdx} className="text-[15px] font-medium">{cleanPara}</p>;
               })}
             </div>
           </div>
         );
       }
+
+      // 5. 无标题的常规块处理
       return (
         <div key={index} className="mb-6 last:mb-0 text-slate-600 leading-loose text-[15px] font-medium space-y-3">
-          {trimmed.split('\n').filter(l => l.trim()).map((line, lIdx) => (<p key={lIdx}>{line.trim()}</p>))}
+          {trimmed.split('\n').filter(l => l.trim()).map((line, lIdx) => (
+            <p key={lIdx}>
+              {line.trim()
+                .replace(/^[-*+]\s+/, '')
+                .replace(/^\d+\.\s+/, '')
+                .replace(/^#{1,6}\s+/, '')
+              }
+            </p>
+          ))}
         </div>
       );
     });
