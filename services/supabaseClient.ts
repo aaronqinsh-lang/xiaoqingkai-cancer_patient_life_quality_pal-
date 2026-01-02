@@ -4,10 +4,10 @@ import { createClient } from '@supabase/supabase-js';
 /**
  * Supabase client initialization.
  * 
- * We prioritize environment variables but provide the project-specific 
- * credentials as defaults to ensure the app works out-of-the-box in the 
- * preview environment.
+ * We prioritize environment variables for secure deployment.
+ * These should be set in your hosting platform's environment variables section.
  */
+
 const env = import.meta.env as Record<string, string | undefined>;
 const supabaseUrl = env.VITE_SUPABASE_URL;
 const supabaseKey = env.VITE_SUPABASE_ANON_KEY;

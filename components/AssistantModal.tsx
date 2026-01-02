@@ -1,8 +1,16 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Mic, Send, Waves, Loader2, StopCircle, History, MessageSquare, Bot } from 'lucide-react';
 import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { UserProfile, ChatMessage } from '../types';
 import { getAssistantResponse } from '../services/geminiService';
+
+// Voice configuration options
+const VOICE_OPTIONS = [
+  { id: 'Schedar', name: '阳光热情', desc: '活力男声', icon: '☀️' },
+  { id: 'Despina', name: '舒缓柔和', desc: '温柔女声', icon: '🌙' },
+  { id: 'Algieba', name: '沉稳专业', desc: '睿智男声', icon: '🎓' },
+];
 
 // Implementation of decode function as per guidelines
 function decode(base64: string) {
@@ -15,7 +23,6 @@ function decode(base64: string) {
 
 // Implementation of decodeAudioData function for raw PCM data as per guidelines
 async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: number, numChannels: number): Promise<AudioBuffer> {
-  // Use byteOffset and byteLength to handle potential alignment issues in underlying buffer
   const dataInt16 = new Int16Array(data.buffer, data.byteOffset, data.byteLength / 2);
   const frameCount = dataInt16.length / numChannels;
   const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
@@ -49,6 +56,7 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
   const [isLoading, setIsLoading] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState('Despina');
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const liveSessionRef = useRef<any>(null);
@@ -182,7 +190,13 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
         },
         config: {
           responseModalities: [Modality.AUDIO],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Zephyr' } } },
+          speechConfig: { 
+            voiceConfig: { 
+              prebuiltVoiceConfig: { 
+                voiceName: selectedVoice 
+              } 
+            } 
+          },
           systemInstruction: "你是'小青卡'健康管家。用中文提供温暖、专业且结构化的建议。"
         }
       });
@@ -264,13 +278,13 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
               )}
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-10 px-8">
-              <div className={`relative flex items-center justify-center w-40 h-40 rounded-full transition-all duration-700 ${isVoiceActive ? 'bg-celadon-50' : 'bg-slate-50 shadow-inner'}`}>
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-8 px-8 py-10">
+              <div className={`relative flex items-center justify-center w-36 h-36 rounded-full transition-all duration-700 ${isVoiceActive ? 'bg-celadon-50' : 'bg-slate-50 shadow-inner'}`}>
                 {isVoiceActive ? (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 bg-celadon-100/50 rounded-full animate-ping opacity-60" />
-                    <button onClick={stopVoice} className="bg-celadon-900 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl relative z-10 active:scale-90 transition-transform">
-                      <StopCircle className="w-8 h-8" />
+                    <div className="w-28 h-28 bg-celadon-100/50 rounded-full animate-ping opacity-60" />
+                    <button onClick={stopVoice} className="bg-celadon-900 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl relative z-10 active:scale-90 transition-transform">
+                      <StopCircle className="w-7 h-7" />
                     </button>
                   </div>
                 ) : (
@@ -281,10 +295,32 @@ const AssistantModal: React.FC<AssistantModalProps> = ({ isOpen, onClose, userPr
                 <h4 className="font-black text-slate-800 text-lg tracking-tight">{isVoiceActive ? '正在倾听，请对我说...' : '准备好倾听您的声音'}</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">开启语音树洞，我会一直在这里陪伴您。</p>
               </div>
+
               {!isVoiceActive && (
-                <button onClick={startLiveVoice} className="bg-celadon-900 text-white px-8 py-3.5 rounded-full font-black shadow-glaze active:scale-95 transition-all flex items-center gap-3">
-                  <Waves className="w-5 h-5 animate-pulse" /> 开启语音树洞
-                </button>
+                <div className="space-y-6 w-full max-w-xs">
+                  <div className="flex flex-col gap-3">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">请选择您的专属管家音色</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {VOICE_OPTIONS.map(v => (
+                        <button 
+                          key={v.id} 
+                          onClick={() => setSelectedVoice(v.id)}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all duration-300 active:scale-95 ${selectedVoice === v.id ? 'bg-celadon-900 border-celadon-900 text-white shadow-glaze' : 'bg-white border-slate-100 text-slate-400'}`}
+                        >
+                          <span className="text-lg">{v.icon}</span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-[9px] font-black leading-tight whitespace-nowrap">{v.name}</span>
+                            <span className={`text-[7px] opacity-60 font-bold ${selectedVoice === v.id ? 'text-celadon-100' : 'text-slate-300'}`}>{v.desc}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button onClick={startLiveVoice} className="w-full bg-celadon-900 text-white py-4 rounded-full font-black shadow-glaze active:scale-95 transition-all flex items-center justify-center gap-3">
+                    <Waves className="w-5 h-5 animate-pulse" /> 开启语音树洞
+                  </button>
+                </div>
               )}
             </div>
           )}
